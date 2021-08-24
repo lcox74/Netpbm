@@ -71,7 +71,7 @@ int main() {
 
 Below is the image output from the code above:
 
-![test image](res/out.png)
+![test image](res/example.png)
 
 > The image used to show on markdown is the result of opening the 
 > image in GIMP and exporting it to `.png` so markdown can view it.
