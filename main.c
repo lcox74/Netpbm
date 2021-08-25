@@ -11,7 +11,6 @@ int main() {
     /* Loop through every pixel in image */
     for (u32 y = 0; y < height; ++y) {
         for (u32 x = 0; x < width; ++x) {
-
             /* Precalc HSV values */
             hue = (x / (float)width) * 360.0f;
             saturation = 1.0f;

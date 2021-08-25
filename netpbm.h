@@ -33,16 +33,41 @@ int construct_pam_image(const char* file, u32 *buffer, size_t w, size_t h);
 
 /** Implementations **/
 
-/* Constructs a pbm image using a buffer [Currently Unsupported]*/
+/*
+ * Constructs a pbm image using a buffer, if the value in the buffer is not 0
+ * then it is white, else if it is 0 then the pixel is black
+ */
 int construct_pbm_image(const char* file, u8 *buffer, size_t w, size_t h) {
-    (void)file;
-    (void)buffer;
-    (void)w;
-    (void)h;
-    return 1;
+    FILE *fp;
+    u32 i;
+    u8 mini_buffer, buf_count;
+
+    // Create File
+    if (!(fp = fopen(file, "wb"))) return 1;
+    
+    // Write header to file
+    fprintf(fp, "P4\n%ld %ld\n", w, h);
+
+    // Write Colour bytes to file
+    buf_count = mini_buffer = 0x00;
+    for (i = 0; i < w * h; ++i) {
+        if (buf_count >= 8) {
+            fwrite((const void *) (&mini_buffer), sizeof(u8), 1, fp);
+            mini_buffer = buf_count = 0x00;
+        }
+        mini_buffer |= ((buffer[i] > 0) & 0x1) << buf_count++; 
+    }
+
+    // Writing any data that is left
+    if (buf_count > 0x00) 
+        fwrite((const void *) (&mini_buffer), sizeof(u8), 1, fp);
+
+    // Close file
+    fclose(fp); 
+    return 0;
 }
 
-/* Constructs a pgm image using a buffer*/
+/* Constructs a pgm image using a buffer */
 int construct_pgm_image(const char* file, u16 *buffer, size_t w, size_t h) {
     FILE *fp;
     u32 i;
@@ -62,7 +87,7 @@ int construct_pgm_image(const char* file, u16 *buffer, size_t w, size_t h) {
     return 0;
 }
 
-/* Constructs a ppm image using a buffer*/
+/* Constructs a ppm image using a buffer */
 int construct_ppm_image(const char* file, u32 *buffer, size_t w, size_t h) {
     FILE *fp;
     u32 i;
@@ -82,7 +107,7 @@ int construct_ppm_image(const char* file, u32 *buffer, size_t w, size_t h) {
     return 0;
 }
 
-/* Constructs a pam image using a buffer [Currently Unsupported]*/
+/* Constructs a pam image using a buffer [Currently Unsupported] */
 int construct_pam_image(const char* file, u32 *buffer, size_t w, size_t h) {
     (void)file;
     (void)buffer;
