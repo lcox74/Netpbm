@@ -107,13 +107,25 @@ int construct_ppm_image(const char* file, u32 *buffer, size_t w, size_t h) {
     return 0;
 }
 
-/* Constructs a pam image using a buffer [Currently Unsupported] */
+/* Constructs a pam image using a buffer, allows Alpha */
 int construct_pam_image(const char* file, u32 *buffer, size_t w, size_t h) {
-    (void)file;
-    (void)buffer;
-    (void)w;
-    (void)h;
-    return 1;
+    FILE *fp;
+    u32 i;
+
+    // Create File
+    if (!(fp = fopen(file, "wb"))) return 1;
+    
+    // Write header to file
+    fprintf(fp, "P7\nWIDTH %ld\nHEIGHT%ld\nDEPTH 4\nMAXVAL 255\nTUPLTYPE "
+                "RGB_ALPHA\nENDHDR\n", w, h);
+
+    // Write Colour bytes to file
+    for (i = 0; i < w * h; ++i)
+        fwrite((const void *) &buffer[i], sizeof(u8), 4, fp);
+    
+    // Close file
+    fclose(fp); 
+    return 0;
 }
 
 /*
